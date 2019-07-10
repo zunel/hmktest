@@ -12,7 +12,7 @@ pipeline {
        stage('\u27A1 Preparation') {
         steps {
           checkout([$class: 'GitSCM', branches: [[name: '*/$DEVBRANCH']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', timeout: 360]],
-submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/zunel/ubuntu_builds_jenkins.git']]])
+submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/zunel/hmktest.git']]])
         }
        }
        stage('\u2756 Build and Test in docker container') {
