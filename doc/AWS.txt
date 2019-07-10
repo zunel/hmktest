@@ -1,0 +1,18 @@
+1) Login into your account
+2) Select EC2 type t2
+3) Launch instance --> Ubuntu server 16.04 --> t2.micro --> Review and Launch (optional a TAG to easily identify the instance)
+4) Launch
+5) Generate and save the pub key pair in your PC (downlaod and save), be careful is one chance and otherwise will not be able to access the instance
+6) After savin the key pair launc the instance
+7) Click on launching instance and look for pub IP address
+8) Look at security groups -- Inbond 22 0.0.0.0
+9) Define Jenkins port 8080 in order to access Jenkins from outside
+10) All Outbound ports should be accessible
+11) When running access it from console using ssh ubuntu@pub.ip password is usually ubuntu
+12) Use private key (key pair) stored in your PC
+13) Download the Jenkins rpm (can use latest LTS for Ubuntu/Debina) wget https://pkg.jenkins.io/debian-stable/binary/jenkins_2.176.1_all.deb
+14) Install it apt-get install  jenkins_2.176.1_all.deb  and enable and run the Jenkins service
+15) Configure it with needed plugins
+16) Copy the job in this repo stored at https://github.com/zunel/hmktest/tree/master/jenkins/UbuntuBuildDocker
+17) It is assumed Docker and mutt are installed in the server (look for any other missing dependencies like java 8 etc)
+18) Run the job and test the resulting image
