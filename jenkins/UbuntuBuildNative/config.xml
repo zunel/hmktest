@@ -1,0 +1,76 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.32">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.7"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.22.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.synopsys.arc.jenkins.plugins.ownership.jobs.JobOwnerJobProperty plugin="ownership@0.12.1"/>
+    <com.suryagaddipati.jenkins.SlaveUtilizationProperty plugin="slave-utilization-plugin@1.8">
+      <needsExclusiveAccessToNode>false</needsExclusiveAccessToNode>
+      <singleInstancePerSlave>false</singleInstancePerSlave>
+      <slaveUtilizationPercentage>0</slaveUtilizationPercentage>
+    </com.suryagaddipati.jenkins.SlaveUtilizationProperty>
+    <hudson.plugins.libvirt.BeforeJobSnapshotJobProperty plugin="libvirt-slave@1.8.5"/>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.31">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <com.synopsys.arc.jenkinsci.plugins.jobrestrictions.jobs.JobRestrictionProperty plugin="job-restrictions@0.8"/>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>BRANCH</name>
+          <description></description>
+          <defaultValue>master</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.70">
+    <script>node {
+    def app
+
+    stage(&apos;Clone repository&apos;) {
+        /* Let&apos;s make sure we have the repository cloned to our workspace */
+
+         git url: &apos;https://github.com/civetweb/civetweb.git&apos;
+    }
+
+    stage(&apos;Build image&apos;) {
+        /* This builds the actual image; synonymous to
+         * docker build on the command line */
+
+        app = docker.build(&quot;getintodevops/hellonode&quot;)
+    }
+
+    stage(&apos;Test image&apos;) {
+        /* Ideally, we would run a test framework against our image.
+         * For this example, we&apos;re using a Volkswagen-type approach ;-) */
+
+        app.inside {
+            sh &apos;echo &quot;Tests passed&quot;&apos;
+        }
+    }
+
+    stage(&apos;Push image&apos;) {
+        /* Finally, we&apos;ll push the image with two tags:
+         * First, the incremental build number from Jenkins
+         * Second, the &apos;latest&apos; tag.
+         * Pushing multiple tags is cheap, as all the layers are reused. */
+        docker.withRegistry(&apos;https://registry.hub.docker.com&apos;, &apos;docker-hub-credentials&apos;) {
+            app.push(&quot;${env.BUILD_NUMBER}&quot;)
+            app.push(&quot;latest&quot;)
+        }
+    }
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

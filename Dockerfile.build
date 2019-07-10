@@ -1,0 +1,26 @@
+## DABM 20190709
+FROM ubuntu:16.04
+LABEL version="1.0"
+
+## update system
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y
+RUN apt-get dist-upgrade -y
+
+## Install dev tools
+RUN apt-get install -y autoconf \
+  build-essential \
+  bzip2 \
+  curl \
+  gcc \
+  git \
+  cmake
+
+COPY build.sh /
+COPY control /opt
+COPY index.html /opt
+COPY ReadMe.txt /opt
+
+##CMD ["/bin/bash"]
+ENTRYPOINT /build.sh ; /bin/bash
+

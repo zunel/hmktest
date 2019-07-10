@@ -1,0 +1,27 @@
+## DABM 20190709
+FROM ubuntu:16.04
+LABEL version="1.0"
+
+ARG REV
+
+## Create user and group and copy the deb file
+RUN groupadd civetweb && useradd -g civetweb civetweb
+COPY civetweb_package_${REV}.deb /opt
+COPY start.sh /usr/bin/
+
+## Upgrade system and install deb package
+RUN apt-get update -y && apt-get install -y /opt/civetweb_package_${REV}.deb
+#RUN apt-get dist-upgrade -y
+
+## Change ownership
+RUN chown civetweb:civetweb /opt/civetweb && cd /opt/civetweb/bin
+
+## Expose the web server port
+ENTRYPOINT ["start.sh"]
+
+EXPOSE 8080/tcp
+
+## Run the server
+CMD [ "civetweb" ]
+
+
